@@ -93,7 +93,7 @@ o no existe.
 
 ### 2.3 Qué se permite usar en PHP 7.0.14
 
-PHP 7.0 ya trae suficiente para escribir plugins cómodos. Ejemplo correcto, compilable
+PHP 7.0 ya trae suficiente para escribir plugins cómodos. Ejemplo incorrecto, no compilable
 tal cual en 7.0.14:
 
 ```php
@@ -450,7 +450,7 @@ Notas de la época:
    (en YAML comillas dobles convertirían `\` en escape).
 3. El valor de `main` apunta a la clase cuyo archivo vive bajo `src/` con estructura
    PSR-4 cuando se usa DevTools en modo fuente; en un phar compilado las clases quedan
-   en la raíz. Verificá la variante que use tu proyecto [VERIFICAR].
+   en la raíz. Verificá la variante que use tu proyecto.
 4. No agregues campos de plugin.yml modernos (`loadbefore`, `creators`...) que la
    parser de la época desconoce.
 
@@ -477,9 +477,8 @@ class Main extends PluginBase implements Listener
     public function onEnable()
     {
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
-        // [VERIFICAR] si PluginBase no expone getScheduler(), la variante de la era es
-        // $this->getServer()->getScheduler()->scheduleRepeatingTask(...)
-        $this->getScheduler()->scheduleRepeatingTask(new task\ResumenTask($this), 1200);
+        // PluginBase no expone getScheduler()
+        // $this->getServer()->getScheduler()->scheduleRepeatingTask(new task\ResumenTask($this), 1200);
     }
 
     public function onDisable()
@@ -585,16 +584,13 @@ Registro en `Main::onEnable()`:
 
 ```php
 $this->getServer()->getCommandMap()->register("mikitoplugin", new PuntosCommand($this));
-// [VERIFICAR] existencia y firma exacta de getCommandMap() en la API 2.0.0
 ```
 
 Notas:
 
-1. `setPermission()` y `testPermission()` siguen el estilo Bukkit de la época
-   [VERIFICAR].
-2. También podés declarar el comando en `plugin.yml` bajo `commands:`; la parser de la
-   era crea el `PluginCommand` correspondiente y el manejo se delega a tu clase de
-   comando [VERIFICAR].
+1. `setPermission()` y `testPermission()` siguen el estilo Bukkit de la época.
+2. También podés declarar el comando en `plugin.yml` bajo `commands:`; Usando `CommandExecute` y el manejo se delega a tu clase de
+   comando.
 3. `execute()` no lleva tipo de retorno y su cuerpo valida siempre `$args` y permisos
    antes de hacer nada.
 
@@ -635,8 +631,8 @@ Eventos más usados de la era:
 | `PlayerChatEvent` | `pocketmine\event\player` | `getPlayer()`, `getMessage()`, `setMessage()`, `setFormat()` |
 | `PlayerMoveEvent` | `pocketmine\event\player` | `getPlayer()`, `getFrom()`, `getTo()` |
 | `PlayerCommandPreprocessEvent` | `pocketmine\event\player` | `getPlayer()`, `getMessage()`, `setCancelled()` |
-| `PlayerInteractEvent` | `pocketmine\event\player` | `getPlayer()`, `getBlock()`, `getItem()`, `getAction()` [VERIFICAR] |
-| `PlayerDeathEvent` | `pocketmine\event\player` [VERIFICAR] | `getPlayer()`, `getEntity()` |
+| `PlayerInteractEvent` | `pocketmine\event\player` | `getPlayer()`, `getBlock()`, `getItem()`, `getAction()` |
+| `PlayerDeathEvent` | `pocketmine\event\player` | `getPlayer()`, `getEntity()` |
 | `BlockBreakEvent` | `pocketmine\event\block` | `getPlayer()`, `getBlock()`, `setCancelled()` |
 | `BlockPlaceEvent` | `pocketmine\event\block` | `getPlayer()`, `getBlock()`, `setCancelled()` |
 | `EntityDamageEvent` | `pocketmine\event\entity` | `getEntity()`, `setDamage()`, `setCancelled()` |
@@ -727,9 +723,8 @@ $config->save();
 
 Notas:
 
-1. Los tipos de `Config` de la época son `Config::YAML` y `Config::JSON` como uso
-   principal, además de variantes serializadas de la propia clase [VERIFICAR lista
-   exacta de constantes].
+1. Los tipos de `Config` de la época son `Config::YAML` como uso
+   principal, además de variantes serializadas de la propia clase.
 2. `Config::get($clave, $defecto)` devuelve lo que guardaste sin garantías de tipo:
    siempre validá con `is_int()`, `is_numeric()` o `is_string()` antes de usarlo en
    cálculos.
@@ -741,7 +736,7 @@ Colores y formato con `pocketmine\utils\TextFormat`:
 use pocketmine\utils\TextFormat;
 
 $player->sendMessage(TextFormat::GREEN . "Puntos: " . TextFormat::WHITE . $puntos);
-$limpio = TextFormat::clean($mensajeDelUsuario); // [VERIFICAR] método clean()
+$limpio = TextFormat::clean($mensajeDelUsuario); // Este metodo NO EXISTE. Como mucho, usa TextFormat::RESET
 ```
 
 ### 3.9 Items y bloques por ID numérico
@@ -758,8 +753,7 @@ $piedra = Item::get(1, 0, 64);    // 64 de piedra
 $bloque = Block::get(49, 0);      // obsidiana
 ```
 
-Firma de la era: `Item::get($id, $meta = 0, $count = 1)` y `Block::get($id, $meta = 0)`
-[VERIFICAR firmas exactas]. El segundo parámetro es el meta / daño (por ejemplo el
+Firma de la era: `Item::get($id, $meta = 0, $count = 1)` y `Block::get($id, $meta = 0)`. El segundo parámetro es el meta / daño (por ejemplo el
 color de la lana, 0-15).
 
 IDs de uso común en la era 0.15:
@@ -798,13 +792,13 @@ tu plugin en lugar de "adivinar" un string moderno.
 | Modo de juego | `$player->getGamemode()` devuelve `int` (0 supervivencia, 1 creativo, 2 aventura) |
 | Cambiar modo | `$player->setGamemode(1)` |
 | Mundo actual | `$player->getLevel()` |
-| Teletransportar | `$player->teleport($posicion)` [VERIFICAR firma completa] |
+| Teletransportar | `$player->teleport(Vector3 $position)` |
 | Inventario | `$player->getInventory()->setItemInHand(Item::get(276))` |
-| Desconectar | `$player->kick($motivo)` [VERIFICAR] |
+| Desconectar | `$player->kick($motivo)` |
 | Servidor desde el plugin | `$this->getServer()` (no hace falta `Server::getInstance()`) |
 | Carpeta del plugin | `$this->getDataFolder()` |
 | Logger | `$this->getLogger()->info($texto)` |
-| Mundo por nombre | `$this->getServer()->getLevelByName("world")` [VERIFICAR] |
+| Mundo por nombre | `$this->getServer()->getLevelByName("world")` |
 | Bloque en posición | `$level->getBlock(new Vector3($x, $y, $z))` |
 
 Notas:
@@ -823,6 +817,7 @@ con una API prácticamente idéntica. Es válido que un plugin de esta constituc
 funcione en ellos, pero no codees contra APIs exclusivas de un fork: mantené el mínimo
 común denominador (los namespaces y firmas documentados acá) para que el mismo código
 corra en PocketMine 2.0.0, Genisys e ImagicalMine sin cambios.
+Idealmente se prefiere Genisys, ya que es el fork que usa PHP 7.0.x
 
 ## 4. Arquitectura y calidad
 
@@ -892,7 +887,7 @@ Esto es lo que los LLM tienden a generar (y lo que rompía los servidores de 201
 
 1. PSR-1: un archivo = una clase = un namespace; `<?php` sin `?>` de cierre; sin
    efectos secundarios al incluir archivos.
-2. PSR-2: indentación de 4 espacios (nunca tabs); llave de apertura en línea propia
+2. PSR-2: indentación de 4 espacios (nunca tabs); llave de apertura en línea nueva
    para clases y métodos y en la misma línea para estructuras de control; línea en
    blanco después de la declaración de `namespace`; visibilidad declarada en cada
    método y propiedad.
@@ -920,7 +915,7 @@ Esto es lo que los LLM tienden a generar (y lo que rompía los servidores de 201
 6. No le muestres a los jugadores mensajes de error internos, stack traces ni rutas del
    sistema: logueá en el logger del plugin y devolvé un mensaje genérico.
 7. Limpia los códigos de color del input de usuario antes de reenviarlo (chat, signos,
-   libros) con `TextFormat::clean()` [VERIFICAR] para evitar inyección de formato.
+   libros) con `TextFormat::RESET` para evitar inyección de formato.
 8. Si hay que hashear credenciales, usá `password_hash()` / `password_verify()`
    (disponibles en 7.0); nunca MD5 ni SHA1 crudos.
 9. No guardes secretos ni tokens en `plugin.yml` ni en el código fuente.
