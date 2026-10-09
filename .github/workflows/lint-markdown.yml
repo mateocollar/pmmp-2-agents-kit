@@ -1,0 +1,28 @@
+name: Lint de Markdown
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  markdownlint:
+    name: markdownlint-cli
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lintear archivos Markdown
+        run: >
+          npx --yes markdownlint-cli
+          --disable MD013 MD026
+          --
+          "*.md"
+          "en/*.md"
+          "es/*.md"
+          ".github/*.md"
+          ".github/ISSUE_TEMPLATE/*.md"

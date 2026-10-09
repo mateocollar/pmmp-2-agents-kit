@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Consultar al mantenedor
+    url: https://github.com/mateocollar
+    about: Dudas sobre el proyecto o interés en colaborar directamente con mateocollar.
+  - name: Buscar en los issues abiertos
+    url: https://github.com/mateocollar/pmmp-2-agents-kit/issues
+    about: Revisá si tu bug o idea ya fue reportada antes de abrir un issue nuevo.
