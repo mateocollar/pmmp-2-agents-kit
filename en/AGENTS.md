@@ -92,8 +92,8 @@ or it does not exist.
 
 ### 2.3 What you are allowed to use in PHP 7.0.14
 
-PHP 7.0 already ships enough to write plugins comfortably. Correct example, compilable
-as-is on 7.0.14:
+PHP 7.0 already ships enough to write plugins comfortably. Incorrect example, not
+compilable as-is on 7.0.14:
 
 ```php
 <?php
@@ -448,7 +448,7 @@ Era notes:
    (in YAML double quotes would turn `\` into an escape sequence).
 3. The `main` value points at the class whose file lives under `src/` following PSR-4
    when using DevTools in source mode; in a compiled phar the classes sit at the root.
-   Check which variant your project uses [VERIFICAR].
+   Check which variant your project uses.
 4. Do not add modern plugin.yml fields (`loadbefore`, `creators`...) that the era's
    parser does not know about.
 
@@ -475,9 +475,8 @@ class Main extends PluginBase implements Listener
     public function onEnable()
     {
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
-        // [VERIFICAR] if PluginBase does not expose getScheduler(), the era variant is
-        // $this->getServer()->getScheduler()->scheduleRepeatingTask(...)
-        $this->getScheduler()->scheduleRepeatingTask(new task\ResumenTask($this), 1200);
+        // PluginBase does not expose getScheduler()
+        // $this->getServer()->getScheduler()->scheduleRepeatingTask(new task\ResumenTask($this), 1200);
     }
 
     public function onDisable()
@@ -582,16 +581,13 @@ Registration inside `Main::onEnable()`:
 
 ```php
 $this->getServer()->getCommandMap()->register("mikitoplugin", new PuntosCommand($this));
-// [VERIFICAR] existence and exact signature of getCommandMap() in the 2.0.0 API
 ```
 
 Notes:
 
-1. `setPermission()` and `testPermission()` follow the era's Bukkit style
-   [VERIFICAR].
-2. You may also declare the command in `plugin.yml` under `commands:`; the era's
-   parser creates the corresponding `PluginCommand` and execution is delegated to your
-   command class [VERIFICAR].
+1. `setPermission()` and `testPermission()` follow the era's Bukkit style.
+2. You can also declare the command in `plugin.yml` under `commands:`; using
+   `CommandExecute`, handling is delegated to your command class.
 3. `execute()` has no return type and its body always validates `$args` and
    permissions before doing anything.
 
@@ -632,8 +628,8 @@ Most used events of the era:
 | `PlayerChatEvent` | `pocketmine\event\player` | `getPlayer()`, `getMessage()`, `setMessage()`, `setFormat()` |
 | `PlayerMoveEvent` | `pocketmine\event\player` | `getPlayer()`, `getFrom()`, `getTo()` |
 | `PlayerCommandPreprocessEvent` | `pocketmine\event\player` | `getPlayer()`, `getMessage()`, `setCancelled()` |
-| `PlayerInteractEvent` | `pocketmine\event\player` | `getPlayer()`, `getBlock()`, `getItem()`, `getAction()` [VERIFICAR] |
-| `PlayerDeathEvent` | `pocketmine\event\player` [VERIFICAR] | `getPlayer()`, `getEntity()` |
+| `PlayerInteractEvent` | `pocketmine\event\player` | `getPlayer()`, `getBlock()`, `getItem()`, `getAction()` |
+| `PlayerDeathEvent` | `pocketmine\event\player` | `getPlayer()`, `getEntity()` |
 | `BlockBreakEvent` | `pocketmine\event\block` | `getPlayer()`, `getBlock()`, `setCancelled()` |
 | `BlockPlaceEvent` | `pocketmine\event\block` | `getPlayer()`, `getBlock()`, `setCancelled()` |
 | `EntityDamageEvent` | `pocketmine\event\entity` | `getEntity()`, `setDamage()`, `setCancelled()` |
@@ -724,8 +720,8 @@ $config->save();
 
 Notes:
 
-1. The era's `Config` types are mainly `Config::YAML` and `Config::JSON`, plus
-   serialized variants of the class itself [VERIFICAR exact list of constants].
+1. The era's `Config` types are `Config::YAML` as the main use, plus serialized
+   variants of the class itself.
 2. `Config::get($key, $default)` returns whatever you stored with no type guarantees:
    always validate with `is_int()`, `is_numeric()` or `is_string()` before using it in
    calculations.
@@ -737,7 +733,7 @@ Colors and formatting with `pocketmine\utils\TextFormat`:
 use pocketmine\utils\TextFormat;
 
 $player->sendMessage(TextFormat::GREEN . "Points: " . TextFormat::WHITE . $puntos);
-$clean = TextFormat::clean($userMessage); // [VERIFICAR] clean() method
+$clean = TextFormat::clean($userMessage); // This method DOES NOT EXIST. At most, use TextFormat::RESET
 ```
 
 ### 3.9 Items and blocks by numeric ID
@@ -754,9 +750,8 @@ $stone = Item::get(1, 0, 64);    // 64 stone
 $block = Block::get(49, 0);      // obsidian
 ```
 
-Era signatures: `Item::get($id, $meta = 0, $count = 1)` and `Block::get($id, $meta = 0)`
-[VERIFICAR exact signatures]. The second parameter is meta / damage (for example wool
-color, 0-15).
+Era signatures: `Item::get($id, $meta = 0, $count = 1)` and `Block::get($id, $meta = 0)`.
+The second parameter is meta / damage (for example wool color, 0-15).
 
 Common IDs of the 0.15 era:
 
@@ -794,13 +789,13 @@ your plugin instead of "guessing" a modern string.
 | Game mode | `$player->getGamemode()` returns `int` (0 survival, 1 creative, 2 adventure) |
 | Change mode | `$player->setGamemode(1)` |
 | Current world | `$player->getLevel()` |
-| Teleport | `$player->teleport($position)` [VERIFICAR full signature] |
+| Teleport | `$player->teleport(Vector3 $position)` |
 | Inventory | `$player->getInventory()->setItemInHand(Item::get(276))` |
-| Disconnect | `$player->kick($reason)` [VERIFICAR] |
+| Disconnect | `$player->kick($reason)` |
 | Server from the plugin | `$this->getServer()` (no need for `Server::getInstance()`) |
 | Plugin data folder | `$this->getDataFolder()` |
 | Logger | `$this->getLogger()->info($text)` |
-| World by name | `$this->getServer()->getLevelByName("world")` [VERIFICAR] |
+| World by name | `$this->getServer()->getLevelByName("world")` |
 | Block at position | `$level->getBlock(new Vector3($x, $y, $z))` |
 
 Notes:
@@ -819,6 +814,7 @@ with an almost identical API. It is valid for a plugin built under this constitu
 to run on them, but do not code against fork-exclusive APIs: keep the lowest common
 denominator (the namespaces and signatures documented here) so the same code runs on
 PocketMine 2.0.0, Genisys and ImagicalMine unchanged.
+Ideally Genisys is preferred, since it is the fork that uses PHP 7.0.x.
 
 ## 4. Architecture and quality
 
@@ -914,7 +910,7 @@ This is what LLMs tend to generate (and what broke 2016 servers):
 6. Never show players internal error messages, stack traces or system paths: log them
    in the plugin logger and return a generic message.
 7. Strip color codes from user input before relaying it (chat, signs, books) with
-   `TextFormat::clean()` [VERIFICAR] to prevent format injection.
+   `TextFormat::RESET` to prevent format injection.
 8. If credentials must be hashed, use `password_hash()` / `password_verify()` (both
    available in 7.0); never raw MD5 or SHA1.
 9. Never store secrets or tokens in `plugin.yml` or in the source code.
