@@ -1,5 +1,7 @@
 # pmmp-2-agents-kit
 
+![Logo de pmmp-2-agents-kit](assets/logo.png)
+
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![markdownlint](https://github.com/mateocollar/pmmp-2-agents-kit/actions/workflows/lint-markdown.yml/badge.svg)](https://github.com/mateocollar/pmmp-2-agents-kit/actions/workflows/lint-markdown.yml)
 
